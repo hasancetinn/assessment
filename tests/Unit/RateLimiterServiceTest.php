@@ -13,7 +13,7 @@ class RateLimiterServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new RateLimiterService();
+        $this->service = new RateLimiterService;
         Redis::flushdb();
     }
 

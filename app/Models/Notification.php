@@ -84,6 +84,7 @@ class Notification extends Model
         if ($this->status === 'pending') {
             return $this->update(['status' => 'cancelled']);
         }
+
         return false;
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateNotificationRequest;
 use App\Http\Requests\BatchCreateNotificationRequest;
+use App\Http\Requests\CreateNotificationRequest;
 use App\Http\Requests\ListNotificationsRequest;
 use App\Models\Notification;
 use App\Services\NotificationService;

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Redis;
 class RateLimiterService
 {
     protected int $maxPerSecond;
+
     protected int $window;
 
     public function __construct()
@@ -38,6 +39,7 @@ class RateLimiterService
     {
         $key = "rate_limit:{$channel}";
         $currentSecond = now()->timestamp;
+
         return (int) (Redis::get("{$key}:{$currentSecond}") ?? 0);
     }
 }

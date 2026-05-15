@@ -6,7 +6,6 @@ use App\Models\Notification;
 use App\Services\RateLimiterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
 
 class MetricsController extends Controller
 {
@@ -41,7 +40,7 @@ class MetricsController extends Controller
     protected function getSuccessFailureRates(): array
     {
         $last24Hours = now()->subDay();
-        
+
         $total = Notification::where('created_at', '>=', $last24Hours)->count();
         $sent = Notification::where('created_at', '>=', $last24Hours)
             ->where('status', 'sent')->count();
@@ -78,7 +77,7 @@ class MetricsController extends Controller
             $total = Notification::where('channel', $channel)
                 ->where('created_at', '>=', now()->subDay())
                 ->count();
-            
+
             $sent = Notification::where('channel', $channel)
                 ->where('status', 'sent')
                 ->where('created_at', '>=', now()->subDay())

@@ -30,7 +30,7 @@ class FailedJobController extends Controller
     {
         $failedJob = DB::table('failed_jobs')->where('id', $id)->first();
 
-        if (!$failedJob) {
+        if (! $failedJob) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed job not found',
@@ -47,7 +47,7 @@ class FailedJobController extends Controller
     {
         $failedJob = DB::table('failed_jobs')->where('id', $id)->first();
 
-        if (!$failedJob) {
+        if (! $failedJob) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed job not found',
@@ -87,7 +87,7 @@ class FailedJobController extends Controller
     {
         $deleted = DB::table('failed_jobs')->where('id', $id)->delete();
 
-        if (!$deleted) {
+        if (! $deleted) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed job not found',
@@ -103,7 +103,7 @@ class FailedJobController extends Controller
     public function flush(): JsonResponse
     {
         $count = DB::table('failed_jobs')->count();
-        
+
         Artisan::call('queue:flush');
 
         return response()->json([

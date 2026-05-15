@@ -16,7 +16,7 @@ class HealthCheckController extends Controller
             'queue' => $this->checkQueue(),
         ];
 
-        $healthy = !in_array(false, array_column($checks, 'healthy'));
+        $healthy = ! in_array(false, array_column($checks, 'healthy'));
 
         return response()->json([
             'status' => $healthy ? 'healthy' : 'unhealthy',
@@ -29,6 +29,7 @@ class HealthCheckController extends Controller
     {
         try {
             DB::connection()->getPdo();
+
             return [
                 'healthy' => true,
                 'message' => 'Database connection successful',
@@ -36,7 +37,7 @@ class HealthCheckController extends Controller
         } catch (\Exception $e) {
             return [
                 'healthy' => false,
-                'message' => 'Database connection failed: ' . $e->getMessage(),
+                'message' => 'Database connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -45,6 +46,7 @@ class HealthCheckController extends Controller
     {
         try {
             Redis::ping();
+
             return [
                 'healthy' => true,
                 'message' => 'Redis connection successful',
@@ -52,7 +54,7 @@ class HealthCheckController extends Controller
         } catch (\Exception $e) {
             return [
                 'healthy' => false,
-                'message' => 'Redis connection failed: ' . $e->getMessage(),
+                'message' => 'Redis connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -61,6 +63,7 @@ class HealthCheckController extends Controller
     {
         try {
             $jobCount = DB::table('jobs')->count();
+
             return [
                 'healthy' => true,
                 'message' => 'Queue system operational',
@@ -69,7 +72,7 @@ class HealthCheckController extends Controller
         } catch (\Exception $e) {
             return [
                 'healthy' => false,
-                'message' => 'Queue check failed: ' . $e->getMessage(),
+                'message' => 'Queue check failed: '.$e->getMessage(),
             ];
         }
     }

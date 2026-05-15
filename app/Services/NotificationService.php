@@ -12,9 +12,9 @@ class NotificationService
     public function createNotification(array $data): Notification
     {
         $this->validateContent($data['channel'], $data['content']);
-        
+
         $idempotencyKey = $data['idempotency_key'] ?? Str::uuid()->toString();
-        
+
         $notification = Notification::firstOrCreate(
             ['idempotency_key' => $idempotencyKey],
             [
@@ -27,7 +27,7 @@ class NotificationService
             ]
         );
 
-        if ($notification->wasRecentlyCreated && !$notification->scheduled_at) {
+        if ($notification->wasRecentlyCreated && ! $notification->scheduled_at) {
             $this->dispatchNotification($notification);
         }
 
@@ -38,7 +38,7 @@ class NotificationService
     {
         if (count($notifications) > config('services.notification.batch_size_limit', 1000)) {
             throw ValidationException::withMessages([
-                'notifications' => ['Batch size exceeds maximum limit of 1000']
+                'notifications' => ['Batch size exceeds maximum limit of 1000'],
             ]);
         }
 
@@ -60,6 +60,7 @@ class NotificationService
     public function cancelNotification(string $id): bool
     {
         $notification = Notification::findOrFail($id);
+
         return $notification->cancel();
     }
 
@@ -75,7 +76,7 @@ class NotificationService
 
     protected function dispatchNotification(Notification $notification): void
     {
-        $queue = match($notification->priority) {
+        $queue = match ($notification->priority) {
             'high' => 'high',
             'low' => 'low',
             default => 'default',
@@ -96,13 +97,13 @@ class NotificationService
 
         if (strlen($content) > $limit) {
             throw ValidationException::withMessages([
-                'content' => ["Content exceeds maximum length of {$limit} characters for {$channel}"]
+                'content' => ["Content exceeds maximum length of {$limit} characters for {$channel}"],
             ]);
         }
 
         if (empty(trim($content))) {
             throw ValidationException::withMessages([
-                'content' => ['Content is required']
+                'content' => ['Content is required'],
             ]);
         }
     }

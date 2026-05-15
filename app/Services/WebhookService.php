@@ -10,6 +10,7 @@ use RuntimeException;
 class WebhookService
 {
     protected Client $client;
+
     protected string $webhookUrl;
 
     public function __construct()
@@ -52,9 +53,8 @@ class WebhookService
             }
 
             throw new RuntimeException("Unexpected response: HTTP {$statusCode}");
-
         } catch (GuzzleException $e) {
-            throw new RuntimeException("Webhook request failed: " . $e->getMessage());
+            throw new RuntimeException('Webhook request failed: '.$e->getMessage());
         }
     }
 }

@@ -29,7 +29,7 @@ class NotificationApiTest extends TestCase
             'recipient' => '+905551234567',
             'channel' => 'sms',
         ]);
-        
+
         $this->assertEquals(1, Notification::count());
     }
 

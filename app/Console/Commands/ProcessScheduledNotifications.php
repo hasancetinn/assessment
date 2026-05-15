@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 class ProcessScheduledNotifications extends Command
 {
     protected $signature = 'notifications:process-scheduled';
+
     protected $description = 'Process scheduled notifications that are due for delivery';
 
     public function handle(): int
@@ -20,12 +21,13 @@ class ProcessScheduledNotifications extends Command
 
         if ($notifications->isEmpty()) {
             $this->info('No scheduled notifications to process');
+
             return self::SUCCESS;
         }
 
         $count = 0;
         foreach ($notifications as $notification) {
-            $queue = match($notification->priority) {
+            $queue = match ($notification->priority) {
                 'high' => 'high',
                 'low' => 'low',
                 default => 'default',
@@ -36,6 +38,7 @@ class ProcessScheduledNotifications extends Command
         }
 
         $this->info("Dispatched {$count} scheduled notifications");
+
         return self::SUCCESS;
     }
 }

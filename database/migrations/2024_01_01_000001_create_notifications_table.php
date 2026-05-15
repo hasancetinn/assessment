@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('retry_count')->default(0);
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();
-            
+
             $table->index(['status', 'created_at']);
             $table->index(['channel', 'created_at']);
         });
