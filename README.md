@@ -1,67 +1,270 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Event-Driven Notification System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A scalable notification system built with Laravel 11 that processes and delivers messages through multiple channels (SMS, Email, Push) with high throughput and reliable delivery.
 
-## About Laravel
+## Setup
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Prerequisites
+- Docker 20.10+
+- Docker Compose 2.0+
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd assessment
+```
 
-## Learning Laravel
+2. Copy environment file
+```bash
+cp .env.example .env
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Configure webhook URL in `.env`
+```env
+WEBHOOK_URL=https://webhook.site/your-uuid-here
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4. Start the application
+```bash
+docker-compose up -d --build
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5. Run migrations
+```bash
+docker exec -it notification-app php artisan migrate --force
+```
 
-## Laravel Sponsors
+6. Generate application key
+```bash
+docker exec -it notification-app php artisan key:generate --force
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+The API will be available at `http://localhost:8000`
 
-### Premium Partners
+## Bonus Features
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Scheduled Notifications
+Schedule notifications for future delivery:
+```bash
+POST /notifications
+{
+  "recipient": "+905551234567",
+  "channel": "sms",
+  "content": "Your appointment reminder",
+  "scheduled_at": "2024-12-25 10:00:00"
+}
+```
 
-## Contributing
+### Failed Jobs Management
+Monitor and retry failed notifications:
+```bash
+GET /failed-jobs              # List all failed jobs
+GET /failed-jobs/{id}         # Get failed job details
+POST /failed-jobs/{id}/retry  # Retry specific job
+POST /failed-jobs/retry-all   # Retry all failed jobs
+DELETE /failed-jobs/{id}      # Delete failed job
+POST /failed-jobs/flush       # Delete all failed jobs
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### CI/CD Pipeline
+Automated testing and linting on every push via GitHub Actions.
 
-## Code of Conduct
+## API Endpoints
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Base URL:** `http://localhost:8000/api/v1`
 
-## Security Vulnerabilities
+### Create Notification
+```bash
+POST /notifications
+Content-Type: application/json
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+{
+  "recipient": "+905551234567",
+  "channel": "sms",
+  "content": "Your verification code is 123456",
+  "priority": "high"
+}
+```
 
-## License
+### Batch Create (up to 1000)
+```bash
+POST /notifications/batch
+Content-Type: application/json
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# assessment
+{
+  "notifications": [
+    {
+      "recipient": "+905551234567",
+      "channel": "sms",
+      "content": "Message 1"
+    }
+  ]
+}
+```
+
+### Get Notification
+```bash
+GET /notifications/{id}
+```
+
+### Get Batch Notifications
+```bash
+GET /notifications/batch/{batchId}
+```
+
+### Cancel Notification
+```bash
+POST /notifications/{id}/cancel
+```
+
+### List Notifications
+```bash
+GET /notifications?status=sent&channel=sms&per_page=20
+```
+
+Query parameters:
+- `status`: pending, processing, sent, failed, cancelled
+- `channel`: sms, email, push
+- `start_date`: YYYY-MM-DD
+- `end_date`: YYYY-MM-DD
+- `per_page`: 1-100
+
+### System Metrics
+```bash
+GET /metrics
+```
+
+### Health Check
+```bash
+GET /health
+```
+
+### Failed Jobs
+```bash
+GET /failed-jobs
+GET /failed-jobs/{id}
+POST /failed-jobs/{id}/retry
+POST /failed-jobs/retry-all
+DELETE /failed-jobs/{id}
+POST /failed-jobs/flush
+```
+
+## Testing
+
+Run the test suite:
+```bash
+docker exec -it notification-app php artisan test
+```
+
+## Architecture
+
+**Queue System:**
+- 3 priority levels (high, normal, low)
+- Redis-based queue processing
+- Rate limiting: 100 messages/second per channel
+- Automatic retry with exponential backoff
+
+**Services:**
+- `notification-app`: Laravel application (PHP 8.2)
+- `notification-nginx`: Web server (port 8000)
+- `notification-mysql`: Database (MySQL 8.0)
+- `notification-redis`: Queue and cache
+- `notification-queue-worker`: Async job processor
+- `notification-scheduler`: Cron job handler
+
+**Key Features:**
+- Multi-channel support (SMS, Email, Push)
+- Batch operations (up to 1000 notifications)
+- Priority queue management
+- Rate limiting per channel
+- Idempotency support
+- Retry logic with backoff
+- Real-time metrics and monitoring
+- Structured logging with correlation IDs
+
+## Configuration
+
+Key environment variables in `.env`:
+
+```env
+# Webhook Configuration
+WEBHOOK_URL=https://webhook.site/your-uuid-here
+
+# Rate Limiting
+RATE_LIMIT_PER_CHANNEL=100
+RATE_LIMIT_WINDOW=1
+
+# Retry Configuration
+MAX_RETRY_ATTEMPTS=3
+RETRY_BACKOFF_SECONDS=60
+
+# Batch Limits
+BATCH_SIZE_LIMIT=1000
+```
+
+## Monitoring
+
+**View Logs:**
+```bash
+docker logs -f notification-app
+docker logs -f notification-queue-worker
+```
+
+**Queue Status:**
+```bash
+docker exec -it notification-app php artisan queue:monitor
+```
+
+**Failed Jobs:**
+```bash
+docker exec -it notification-app php artisan queue:failed
+docker exec -it notification-app php artisan queue:retry all
+```
+
+## API Documentation
+
+Full OpenAPI specification: `openapi.yaml`
+
+View with Swagger Editor: https://editor.swagger.io/
+
+## Troubleshooting
+
+**Clear caches:**
+```bash
+docker exec -it notification-app php artisan config:clear
+docker exec -it notification-app php artisan route:clear
+docker exec -it notification-app php artisan cache:clear
+```
+
+**Restart services:**
+```bash
+docker-compose restart
+```
+
+**Stop services:**
+```bash
+docker-compose down
+```
+
+**Rebuild:**
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+## Content Limits
+
+- SMS: 160 characters
+- Email: 10,000 characters
+- Push: 256 characters
+
+## Technology Stack
+
+- Laravel 11.31
+- PHP 8.2
+- MySQL 8.0
+- Redis 7
+- Nginx (Alpine)
+- Docker & Docker Compose
